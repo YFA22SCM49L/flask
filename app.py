@@ -75,7 +75,7 @@ def github():
 
     issues_reponse = []
     # Iterating to get issues for every month for the past 12 months
-    for i in range(12):
+    for i in range(24):
         last_month = today + dateutil.relativedelta.relativedelta(months=-1)
         types = 'type:issue'
         repo = 'repo:' + repo_name
