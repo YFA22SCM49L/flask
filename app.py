@@ -88,9 +88,9 @@ def github():
         search_query = types + ' ' + repo + ' ' + ranges
 
         # Append the search query to the GitHub API URL
-        query_url = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
-        # requsets.get will fetch requested query_url from the GitHub API
-        search_issues = requests.get(query_url, headers=headers, params=params)
+        query_url_issues = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
+        # requsets.get will fetch requested query_url_issues from the GitHub API
+        search_issues = requests.get(query_url_issues, headers=headers, params=params)
         # Convert the data obtained from GitHub API to JSON format
         search_issues = search_issues.json()
         issues_items = []
@@ -170,6 +170,15 @@ def github():
     for key in month_issue_closed_dict.keys():
         array = [str(key), month_issue_closed_dict[key]]
         closed_at_issues.append(array)
+
+    # Search for pull requests
+    types = 'type:pr'
+    search_query = types + ' ' + repo + ' ' + ranges
+    query_url_pulls = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
+    search_pulls = requests.get(query_url_pulls, headers=headers)
+    search_pulls = search_pulls.json()
+    app.logger.error(search_pulls)
+    pulls_items = []
 
     '''
         1. Hit LSTM Microservice by passing issues_response as body
