@@ -128,6 +128,14 @@ def github():
             data['Author'] = current_issue["user"]["login"]
             issues_reponse.append(data)
 
+        query_url_stars = repository_url + "stargazers"
+        search_stars = requests.get(query_url_stars, headers=headers)
+        search_stars = search_stars.json()
+        try:
+            stars_items = search_stars.get("starred_at")
+        except KeyError:
+            app.logger.error("There is no key called starred_at")
+
         # Search for pull requests
         types = 'type:pr'
         search_query = types + ' ' + repo + ' ' + ranges
