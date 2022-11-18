@@ -134,7 +134,6 @@ def github():
         query_url_pulls = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
         search_pulls = requests.get(query_url_pulls, headers=headers)
         search_pulls = search_pulls.json()
-        #app.logger.error(search_pulls)
         pulls_items = []
         try:
             # Extract "items" from search pulls
@@ -197,6 +196,25 @@ def github():
         closed_at_issues.append(array)
 
     '''
+    Find the stars and forks of each repo.
+    '''
+
+    repos_list = ["golang/go", "google/go-github", "angular/material", "angular/angular-client",
+        "sebholstein/angular-google-maps", "d3/d3", "facebook/react", "tensorflow/tensorflow",
+        "keras-team/keras", "pallets/flask"]
+    repos_stars = []
+    repos_forks = []
+    for repo in repos_list:
+        repository_url = GITHUB_URL + "repos/" + repo
+        # Fetch GitHub data from GitHub API
+        repository = requests.get(repository_url, headers=headers)
+        # Convert the data obtained from GitHub API to JSON format
+        repository = repository.json()
+        repos_stars.append([repo, repository["stargazers_count"]])
+        repos_forks.append([repo, repository["forks_count"]])
+
+
+    '''
         1. Hit LSTM Microservice by passing issues_response as body
         2. LSTM Microservice will give a list of string containing image paths hosted on google cloud storage
         3. On recieving a valid response from LSTM Microservice, append the above json_response with the response from
@@ -242,8 +260,10 @@ def github():
     json_response = {
         "created": created_at_issues,
         "closed": closed_at_issues,
-        "starCount": repository["stargazers_count"],
-        "forkCount": repository["forks_count"],
+        #"starCount": repository["stargazers_count"],
+        #"forkCount": repository["forks_count"],
+        "starCounts": repos_stars,
+        "forkCounts": repos_forks,
         "createdAtImageUrls": {
             **created_at_response.json(),
         },
