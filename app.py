@@ -74,6 +74,7 @@ def github():
     today = date.today()
 
     issues_reponse = []
+    pulls_response = []
     # Iterating to get issues for every month for the past 12 months
     for i in range(24):
         last_month = today + dateutil.relativedelta.relativedelta(months=-1)
@@ -127,6 +128,30 @@ def github():
             data['Author'] = current_issue["user"]["login"]
             issues_reponse.append(data)
 
+        # Search for pull requests
+        types = 'type:pr'
+        search_query = types + ' ' + repo + ' ' + ranges
+        query_url_pulls = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
+        search_pulls = requests.get(query_url_pulls, headers=headers)
+        search_pulls = search_pulls.json()
+        #app.logger.error(search_pulls)
+        pulls_items = []
+        try:
+            # Extract "items" from search pulls
+            pulls_items = search_pulls.get("items")
+        except KeyError:
+            error = {"error": "Data Not Available"}
+            resp = Response(json.dumps(error), mimetype='application/json')
+            resp.status_code = 500
+            return resp
+        if pulls_items is None:
+            continue
+        for pull in pulls_items:
+            data = {}
+            data['created_at'] = pull['created_at']
+            pulls_response.append(data)
+        app.logger.error("pulls_items size = %d", len(pulls_items))
+
         today = last_month
 
     df = pd.DataFrame(issues_reponse)
@@ -170,15 +195,6 @@ def github():
     for key in month_issue_closed_dict.keys():
         array = [str(key), month_issue_closed_dict[key]]
         closed_at_issues.append(array)
-
-    # Search for pull requests
-    types = 'type:pr'
-    search_query = types + ' ' + repo + ' ' + ranges
-    query_url_pulls = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
-    search_pulls = requests.get(query_url_pulls, headers=headers)
-    search_pulls = search_pulls.json()
-    app.logger.error(search_pulls)
-    pulls_items = []
 
     '''
         1. Hit LSTM Microservice by passing issues_response as body
