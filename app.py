@@ -199,7 +199,7 @@ def github():
     Find the stars and forks of each repo.
     '''
 
-    repos_list = ["golang/go", "google/go-github", "angular/material", "angular/angular-client",
+    repos_list = ["golang/go", "google/go-github", "angular/material", "angular/angular-cli",
         "sebholstein/angular-google-maps", "d3/d3", "facebook/react", "tensorflow/tensorflow",
         "keras-team/keras", "pallets/flask"]
     repos_stars = []
