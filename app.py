@@ -129,16 +129,6 @@ def github():
             data['Author'] = current_issue["user"]["login"]'''
             issues_reponse.append(data)
 
-        '''
-        query_url_stars = repository_url + "stargazers"
-        search_stars = requests.get(query_url_stars, headers=headers)
-        search_stars = search_stars.json()
-        try:
-            stars_items = search_stars.get("starred_at")
-        except KeyError:
-            app.logger.error("There is no key called starred_at")
-        '''
-
         # Search for pull requests
         types = 'type:pr'
         search_query = types + ' ' + repo + ' ' + ranges
@@ -205,23 +195,6 @@ def github():
     for key in month_issue_closed_dict.keys():
         array = [str(key), month_issue_closed_dict[key]]
         closed_at_issues.append(array)
-
-    '''df = pd.DataFrame(pulls_response)
-    pulls_created_at = df.groupby(['created_at'], as_index=False).count()
-    dataFrameCreated = pulls_created_at[['created_at', 'issue_number']]
-    dataFrameCreated.columns = ['date', 'count']
-    created_at = df['created_at']
-    month_pulls_created = pd.to_datetime(
-        pd.Series(created_at), format='%Y/%m/%d')
-    month_pulls_created.index = month_pulls_created.dt.to_period('m')
-    month_pulls_created = month_pulls_created.groupby(level=0).size()
-    month_pulls_created = month_pulls_created.reindex(pd.period_range(
-        month_pulls_created.index.min(), month_pulls_created.index.max(), freq='m'), fill_value=0)
-    month_pulls_created_dict = month_pulls_created.to_dict()
-    created_at_pulls = []
-    for key in month_pulls_created_dict.keys():
-        array = [str(key), month_pulls_created_dict[key]]
-        created_at_pulls.append(array)'''
 
     '''
     Find the stars and forks of each repo.
@@ -318,7 +291,7 @@ def github():
         "closedAtImageUrls": {
             **closed_at_response.json(),
         },
-        "pullsImagesUrls": {
+        "pullsImageUrls": {
             **pulls_at_response.json(),
         },
     }
