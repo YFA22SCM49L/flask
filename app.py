@@ -159,7 +159,7 @@ def github():
         for pull in pulls_items:
             data = {}
             data['created_at'] = pull['created_at']
-            data['number'] = pull['number']
+            #data['number'] = pull['number']
             pulls_response.append(data)
 
         today = last_month
