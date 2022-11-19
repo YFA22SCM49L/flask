@@ -220,7 +220,7 @@ def github():
         created_issues_count = 0
         closed_issues_count = 0
         for i in range(24):
-            last_month = date.today() + dateutil.relativedelta.relativedelta(months=-1)
+            last_month = today + dateutil.relativedelta.relativedelta(months=-1)
             ranges = 'created:' + str(last_month) + '..' + str(today)
             search_query = 'type:issue' + ' ' + 'repo:' + repo + ' ' + ranges
             query_url_issues = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
