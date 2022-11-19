@@ -225,7 +225,18 @@ def github():
             query_url_issues = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
             search_issues = requests.get(query_url_issues, headers=headers)
             search_issues = search_issues.json()
-            created_issues_count += len(search_issues)
+            issues_items = []
+            try:
+                # Extract "items" from search issues
+                issues_items = search_issues.get("items")
+            except KeyError:
+                error = {"error": "Data Not Available"}
+                resp = Response(json.dumps(error), mimetype='application/json')
+                resp.status_code = 500
+                return resp
+            if issues_items is None:
+                continue
+            created_issues_count += len(issues_items)
             current_day = date.today() + dateutil.relativedelta.relativedelta(days=-1)
         repos_created_issues.append([repo, created_issues_count])
 
