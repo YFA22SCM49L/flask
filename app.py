@@ -238,7 +238,7 @@ def github():
         #repository = requests.get(repository_url, headers=headers)
         # Convert the data obtained from GitHub API to JSON format
         #repository = repository.json()
-        query_url_stars = repository_url + "stargazers"
+        query_url_stars = repository_url + "/stargazers"
         search_stars = requests.get(query_url_stars, headers=headers)
         search_stars = search_stars.json()
         try:
