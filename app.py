@@ -249,7 +249,7 @@ def github():
         if stars_dates is None:
             continue
         df_stars = pd.DataFrame(stars_dates)'''
-        repos_stars.append([repo, repository["stargazers_count"])
+        repos_stars.append([repo, repository["stargazers_count"]])
         repos_forks.append([repo, repository["forks_count"]])
 
 
