@@ -199,32 +199,35 @@ def github():
     '''
     Find the stars and forks of each repo.
     '''
-
     repos_list = ["golang/go", "google/go-github", "angular/material", "angular/angular-cli",
         "sebholstein/angular-google-maps", "d3/d3", "facebook/react", "tensorflow/tensorflow",
         "keras-team/keras", "pallets/flask"]
-    two_years = date.today() + dateutil.relativedelta.relativedelta(months=-24)
+    two_years = date.today() + dateutil.relativedelta.relativedelta(years=-2)
     repos_stars = []
     repos_forks = []
+    repos_created_issues = []
     for repo in repos_list:
         repository_url = GITHUB_URL + "repos/" + repo
         # Fetch GitHub data from GitHub API
         repository = requests.get(repository_url, headers=headers)
         # Convert the data obtained from GitHub API to JSON format
         repository = repository.json()
-        '''query_url_stars = repository_url + "/stargazers"
-        search_stars = requests.get(query_url_stars, headers=headers)
-        search_stars = search_stars.json()
-        try:
-            stars_dates = search_stars.get("starred_at")
-        except KeyError:
-            app.logger.error("There is no key called starred_at")
-        if stars_dates is None:
-            continue
-        df_stars = pd.DataFrame(stars_dates)'''
         repos_stars.append([repo, repository["stargazers_count"]])
         repos_forks.append([repo, repository["forks_count"]])
 
+        current_day = date.today()
+        types = 'type:issue'
+        repo = 'repo:' + repo
+        created_issues_count = 0
+        while current_day != two_years:
+            created_date = 'created:' + str(current_day)
+            search_query = 'type:issue' + ' ' + 'repo:' + repo + ' ' + created_date
+            query_url_issues = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
+            search_issues = requests.get(query_url_issues, headers=headers)
+            search_issues = search_issues.json()
+            created_issues_count += len(search_issues)
+            current_day = date.today() + dateutil.relativedelta.relativedelta(days=-1)
+        repos_created_issues.append([repo, created_issues_count])
 
     '''
         1. Hit LSTM Microservice by passing issues_response as body
@@ -281,8 +284,6 @@ def github():
     json_response = {
         "created": created_at_issues,
         "closed": closed_at_issues,
-        #"starCount": repository["stargazers_count"],
-        #"forkCount": repository["forks_count"],
         "starCounts": repos_stars,
         "forkCounts": repos_forks,
         "createdAtImageUrls": {
