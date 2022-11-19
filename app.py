@@ -216,7 +216,7 @@ def github():
         repos_stars.append([repo, repository["stargazers_count"]])
         repos_forks.append([repo, repository["forks_count"]])
 
-        today = date.today()
+        '''today = date.today()
         created_issues_count = 0
         closed_issues_count = 0
         for i in range(24):
@@ -242,7 +242,7 @@ def github():
             created_issues_count += len(issues_items)
             today = last_month
         repos_created_issues.append([repo, created_issues_count])
-        repos_closed_issues.append([repo, closed_issues_count])
+        repos_closed_issues.append([repo, closed_issues_count])'''
 
     '''
         1. Hit LSTM Microservice by passing issues_response as body
@@ -301,8 +301,8 @@ def github():
         "closed": closed_at_issues,
         "starCounts": repos_stars,
         "forkCounts": repos_forks,
-        "reposCreatedIssuesCounts": repos_created_issues,
-        "reposClosedIssuesCounts": repos_closed_issues,
+        "monthlyCreatedIssuesCounts": created_at_issues,
+        "monthlyClosedIssuesCounts": closed_at_issues,
         "createdAtImageUrls": {
             **created_at_response.json(),
         },
