@@ -74,6 +74,7 @@ def github():
     today = date.today()
 
     issues_reponse = []
+    pulls_response = []
     # Iterating to get issues for every month for the past 12 months
     for i in range(24):
         last_month = today + dateutil.relativedelta.relativedelta(months=-1)
@@ -88,9 +89,9 @@ def github():
         search_query = types + ' ' + repo + ' ' + ranges
 
         # Append the search query to the GitHub API URL
-        query_url = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
-        # requsets.get will fetch requested query_url from the GitHub API
-        search_issues = requests.get(query_url, headers=headers, params=params)
+        query_url_issues = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
+        # requsets.get will fetch requested query_url_issues from the GitHub API
+        search_issues = requests.get(query_url_issues, headers=headers, params=params)
         # Convert the data obtained from GitHub API to JSON format
         search_issues = search_issues.json()
         issues_items = []
@@ -117,15 +118,48 @@ def github():
             else:
                 # Get closed date of issue
                 data['closed_at'] = current_issue["closed_at"][0:10]
-            for label in current_issue["labels"]:
+            '''for label in current_issue["labels"]:
                 # Get label name of issue
                 label_name.append(label["name"])
             data['labels'] = label_name
             # It gives state of issue like closed or open
             data['State'] = current_issue["state"]
             # Get Author of issue
-            data['Author'] = current_issue["user"]["login"]
+            data['Author'] = current_issue["user"]["login"]'''
             issues_reponse.append(data)
+
+        '''
+        query_url_stars = repository_url + "stargazers"
+        search_stars = requests.get(query_url_stars, headers=headers)
+        search_stars = search_stars.json()
+        try:
+            stars_items = search_stars.get("starred_at")
+        except KeyError:
+            app.logger.error("There is no key called starred_at")
+        '''
+
+        # Search for pull requests
+        types = 'type:pr'
+        search_query = types + ' ' + repo + ' ' + ranges
+        query_url_pulls = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
+        search_pulls = requests.get(query_url_pulls, headers=headers)
+        search_pulls = search_pulls.json()
+        pulls_items = []
+        try:
+            # Extract "items" from search pulls
+            pulls_items = search_pulls.get("items")
+        except KeyError:
+            error = {"error": "Data Not Available"}
+            resp = Response(json.dumps(error), mimetype='application/json')
+            resp.status_code = 500
+            return resp
+        if pulls_items is None:
+            continue
+        for pull in pulls_items:
+            data = {}
+            data['created_at'] = pull['created_at']
+            data['issue_number'] = pull['issue_number']
+            pulls_response.append(data)
 
         today = last_month
 
@@ -171,6 +205,53 @@ def github():
         array = [str(key), month_issue_closed_dict[key]]
         closed_at_issues.append(array)
 
+    '''df = pd.DataFrame(pulls_response)
+    pulls_created_at = df.groupby(['created_at'], as_index=False).count()
+    dataFrameCreated = pulls_created_at[['created_at', 'issue_number']]
+    dataFrameCreated.columns = ['date', 'count']
+    created_at = df['created_at']
+    month_pulls_created = pd.to_datetime(
+        pd.Series(created_at), format='%Y/%m/%d')
+    month_pulls_created.index = month_pulls_created.dt.to_period('m')
+    month_pulls_created = month_pulls_created.groupby(level=0).size()
+    month_pulls_created = month_pulls_created.reindex(pd.period_range(
+        month_pulls_created.index.min(), month_pulls_created.index.max(), freq='m'), fill_value=0)
+    month_pulls_created_dict = month_pulls_created.to_dict()
+    created_at_pulls = []
+    for key in month_pulls_created_dict.keys():
+        array = [str(key), month_pulls_created_dict[key]]
+        created_at_pulls.append(array)'''
+
+    '''
+    Find the stars and forks of each repo.
+    '''
+
+    repos_list = ["golang/go", "google/go-github", "angular/material", "angular/angular-cli",
+        "sebholstein/angular-google-maps", "d3/d3", "facebook/react", "tensorflow/tensorflow",
+        "keras-team/keras", "pallets/flask"]
+    two_years = date.today() + dateutil.relativedelta.relativedelta(months=-24)
+    repos_stars = []
+    repos_forks = []
+    for repo in repos_list:
+        repository_url = GITHUB_URL + "repos/" + repo
+        # Fetch GitHub data from GitHub API
+        #repository = requests.get(repository_url, headers=headers)
+        # Convert the data obtained from GitHub API to JSON format
+        #repository = repository.json()
+        query_url_stars = repository_url + "/stargazers"
+        search_stars = requests.get(query_url_stars, headers=headers)
+        search_stars = search_stars.json()
+        try:
+            stars_dates = search_stars.get("starred_at")
+        except KeyError:
+            app.logger.error("There is no key called starred_at")
+        if stars_dates is None:
+            continue
+        df_stars = pd.DataFrame(stars_dates)
+        repos_stars.append([repo, df_stars.between_time(str(two_years), str(date.today())).size])
+        repos_forks.append([repo, repository["forks_count"]])
+
+
     '''
         1. Hit LSTM Microservice by passing issues_response as body
         2. LSTM Microservice will give a list of string containing image paths hosted on google cloud storage
@@ -187,9 +268,14 @@ def github():
         "type": "closed_at",
         "repo": repo_name.split("/")[1]
     }
+    '''pulls_at_body = {
+        "issues": pulls_response,
+        "type": "created_at",
+        "repo": repo_name.split("/")[1]
+    }'''
 
     # Update your Google cloud deployed LSTM app URL (NOTE: DO NOT REMOVE "/")
-    LSTM_API_URL = "https://react-pttiosgsna-uc.a.run.app/" + "api/forecast"
+    LSTM_API_URL = "https://lstm-pttiosgsna-uc.a.run.app/" + "api/forecast"
 
     '''
     Trigger the LSTM microservice to forecasted the created issues
@@ -209,6 +295,12 @@ def github():
                                        json=closed_at_body,
                                        headers={'content-type': 'application/json'})
 
+    '''app.logger.error("start LSTM pulls")
+    pulls_at_response = requests.post(LSTM_API_URL,
+                                      json=pulls_at_body,
+                                      headers={'content-type': 'application/json'})
+    app.logger.error("end LSTM pulls")'''
+
     '''
     Create the final response that consists of:
         1. GitHub repository data obtained from GitHub API
@@ -217,8 +309,10 @@ def github():
     json_response = {
         "created": created_at_issues,
         "closed": closed_at_issues,
-        "starCount": repository["stargazers_count"],
-        "forkCount": repository["forks_count"],
+        #"starCount": repository["stargazers_count"],
+        #"forkCount": repository["forks_count"],
+        "starCounts": repos_stars,
+        "forkCounts": repos_forks,
         "createdAtImageUrls": {
             **created_at_response.json(),
         },
