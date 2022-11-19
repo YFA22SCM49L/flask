@@ -268,11 +268,11 @@ def github():
         "type": "closed_at",
         "repo": repo_name.split("/")[1]
     }
-    pulls_at_body = {
+    '''pulls_at_body = {
         "issues": pulls_response,
         "type": "created_at",
         "repo": repo_name.split("/")[1]
-    }
+    }'''
 
     # Update your Google cloud deployed LSTM app URL (NOTE: DO NOT REMOVE "/")
     LSTM_API_URL = "https://lstm-pttiosgsna-uc.a.run.app/" + "api/forecast"
@@ -295,11 +295,11 @@ def github():
                                        json=closed_at_body,
                                        headers={'content-type': 'application/json'})
 
-    app.logger.error("start LSTM pulls")
+    '''app.logger.error("start LSTM pulls")
     pulls_at_response = requests.post(LSTM_API_URL,
                                       json=pulls_at_body,
                                       headers={'content-type': 'application/json'})
-    app.logger.error("end LSTM pulls")
+    app.logger.error("end LSTM pulls")'''
 
     '''
     Create the final response that consists of:
@@ -318,9 +318,6 @@ def github():
         },
         "closedAtImageUrls": {
             **closed_at_response.json(),
-        },
-        "pullsAtResponseUrls": {
-            **pulls_at_response.json(),
         },
     }
     # Return the response back to client (React app)
