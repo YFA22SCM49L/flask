@@ -236,10 +236,10 @@ def github():
     for repo in repos_list:
         repository_url = GITHUB_URL + "repos/" + repo
         # Fetch GitHub data from GitHub API
-        #repository = requests.get(repository_url, headers=headers)
+        repository = requests.get(repository_url, headers=headers)
         # Convert the data obtained from GitHub API to JSON format
-        #repository = repository.json()
-        query_url_stars = repository_url + "/stargazers"
+        repository = repository.json()
+        '''query_url_stars = repository_url + "/stargazers"
         search_stars = requests.get(query_url_stars, headers=headers)
         search_stars = search_stars.json()
         try:
@@ -248,8 +248,8 @@ def github():
             app.logger.error("There is no key called starred_at")
         if stars_dates is None:
             continue
-        df_stars = pd.DataFrame(stars_dates)
-        repos_stars.append([repo, df_stars.between_time(str(two_years), str(date.today())).size])
+        df_stars = pd.DataFrame(stars_dates)'''
+        repos_stars.append([repo, repository["stargazers_count"])
         repos_forks.append([repo, repository["forks_count"]])
 
 
