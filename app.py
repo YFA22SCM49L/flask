@@ -216,8 +216,6 @@ def github():
         repos_forks.append([repo, repository["forks_count"]])
 
         today = date.today()
-        #types = 'type:issue'
-        #repo = 'repo:' + repo
         created_issues_count = 0
         for i in range(24):
             last_month = date.today() + dateutil.relativedelta.relativedelta(months=-1)
@@ -238,6 +236,7 @@ def github():
             if issues_items is None:
                 continue
             created_issues_count += len(issues_items)
+            today = last_month
         repos_created_issues.append([repo, created_issues_count])
 
     '''
@@ -297,6 +296,7 @@ def github():
         "closed": closed_at_issues,
         "starCounts": repos_stars,
         "forkCounts": repos_forks,
+        "reposCreatedIssuesCounts": repos_created_issues,
         "createdAtImageUrls": {
             **created_at_response.json(),
         },
