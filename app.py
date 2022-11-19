@@ -118,14 +118,14 @@ def github():
             else:
                 # Get closed date of issue
                 data['closed_at'] = current_issue["closed_at"][0:10]
-            for label in current_issue["labels"]:
+            '''for label in current_issue["labels"]:
                 # Get label name of issue
                 label_name.append(label["name"])
             data['labels'] = label_name
             # It gives state of issue like closed or open
             data['State'] = current_issue["state"]
             # Get Author of issue
-            data['Author'] = current_issue["user"]["login"]
+            data['Author'] = current_issue["user"]["login"]'''
             issues_reponse.append(data)
 
         '''
