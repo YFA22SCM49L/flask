@@ -205,7 +205,7 @@ def github():
         array = [str(key), month_issue_closed_dict[key]]
         closed_at_issues.append(array)
 
-    df = pd.DataFrame(pulls_reponse)
+    '''df = pd.DataFrame(pulls_response)
     pulls_created_at = df.groupby(['created_at'], as_index=False).count()
     dataFrameCreated = pulls_created_at[['created_at', 'issue_number']]
     dataFrameCreated.columns = ['date', 'count']
@@ -220,7 +220,7 @@ def github():
     created_at_pulls = []
     for key in month_pulls_created_dict.keys():
         array = [str(key), month_pulls_created_dict[key]]
-        created_at_pulls.append(array)
+        created_at_pulls.append(array)'''
 
     '''
     Find the stars and forks of each repo.
@@ -297,7 +297,7 @@ def github():
 
     pulls_at_response = requests.post(LSTM_API_URL,
                                       json=pulls_at_body,
-                                      headers={'content-type': 'application/json'}))
+                                      headers={'content-type': 'application/json'})
 
     '''
     Create the final response that consists of:
