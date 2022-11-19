@@ -215,13 +215,14 @@ def github():
         repos_stars.append([repo, repository["stargazers_count"]])
         repos_forks.append([repo, repository["forks_count"]])
 
-        current_day = date.today()
-        types = 'type:issue'
-        repo = 'repo:' + repo
+        today = date.today()
+        #types = 'type:issue'
+        #repo = 'repo:' + repo
         created_issues_count = 0
-        while current_day != two_years:
-            created_date = 'created:' + str(current_day)
-            search_query = 'type:issue' + ' ' + 'repo:' + repo + ' ' + created_date
+        for i in range(24):
+            last_month = date.today() + dateutil.relativedelta.relativedelta(months=-1)
+            ranges = 'created:' + str(last_month) + '..' + str(today)
+            search_query = 'type:issue' + ' ' + 'repo:' + repo + ' ' + ranges
             query_url_issues = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
             search_issues = requests.get(query_url_issues, headers=headers)
             search_issues = search_issues.json()
@@ -237,7 +238,6 @@ def github():
             if issues_items is None:
                 continue
             created_issues_count += len(issues_items)
-            current_day = date.today() + dateutil.relativedelta.relativedelta(days=-1)
         repos_created_issues.append([repo, created_issues_count])
 
     '''
