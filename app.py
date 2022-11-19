@@ -158,8 +158,8 @@ def github():
         for pull in pulls_items:
             data = {}
             data['created_at'] = pull['created_at']
+            data['issue_number'] = pull['issue_number']
             pulls_response.append(data)
-        app.logger.error("pulls_items size = %d", len(pulls_items))
 
         today = last_month
 
@@ -204,6 +204,23 @@ def github():
     for key in month_issue_closed_dict.keys():
         array = [str(key), month_issue_closed_dict[key]]
         closed_at_issues.append(array)
+
+    df = pd.DataFrame(pulls_reponse)
+    pulls_created_at = df.groupby(['created_at'], as_index=False).count()
+    dataFrameCreated = pulls_created_at[['created_at', 'issue_number']]
+    dataFrameCreated.columns = ['date', 'count']
+    created_at = df['created_at']
+    month_pulls_created = pd.to_datetime(
+        pd.Series(created_at), format='%Y/%m/%d')
+    month_pulls_created.index = month_pulls_created.dt.to_period('m')
+    month_pulls_created = month_pulls_created.groupby(level=0).size()
+    month_pulls_created = month_pulls_created.reindex(pd.period_range(
+        month_pulls_created.index.min(), month_pulls_created.index.max(), freq='m'), fill_value=0)
+    month_pulls_created_dict = month_pulls_created.to_dict()
+    created_at_pulls = []
+    for key in month_pulls_created_dict.keys():
+        array = [str(key), month_pulls_created_dict[key]]
+        created_at_pulls.append(array)
 
     '''
     Find the stars and forks of each repo.
@@ -251,6 +268,11 @@ def github():
         "type": "closed_at",
         "repo": repo_name.split("/")[1]
     }
+    pulls_at_body = {
+        "issues": pulls_response,
+        "type": "created_at",
+        "repo": repo_name.split("/")[1]
+    }
 
     # Update your Google cloud deployed LSTM app URL (NOTE: DO NOT REMOVE "/")
     LSTM_API_URL = "https://lstm-pttiosgsna-uc.a.run.app/" + "api/forecast"
@@ -273,6 +295,10 @@ def github():
                                        json=closed_at_body,
                                        headers={'content-type': 'application/json'})
 
+    pulls_at_response = requests.post(LSTM_API_URL,
+                                      json=pulls_at_body,
+                                      headers={'content-type': 'application/json'}))
+
     '''
     Create the final response that consists of:
         1. GitHub repository data obtained from GitHub API
@@ -290,6 +316,9 @@ def github():
         },
         "closedAtImageUrls": {
             **closed_at_response.json(),
+        },
+        "pullsAtResponseUrls": {
+            **pulls_at_response.json(),
         },
     }
     # Return the response back to client (React app)
