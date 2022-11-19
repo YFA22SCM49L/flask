@@ -295,9 +295,11 @@ def github():
                                        json=closed_at_body,
                                        headers={'content-type': 'application/json'})
 
+    app.logger.error("start LSTM pulls")
     pulls_at_response = requests.post(LSTM_API_URL,
                                       json=pulls_at_body,
                                       headers={'content-type': 'application/json'})
+    app.logger.error("end LSTM pulls")
 
     '''
     Create the final response that consists of:
