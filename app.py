@@ -52,6 +52,7 @@ This API will accept only POST request
 '''
 @app.route('/api/github', methods=['POST'])
 def github():
+    app.logger.error("Start ")
     body = request.get_json()
     # Extract the choosen repositories from the request
     repo_name = body['repository']
@@ -158,7 +159,7 @@ def github():
         for pull in pulls_items:
             data = {}
             data['created_at'] = pull['created_at']
-            data['issue_number'] = pull['issue_number']
+            data['number'] = pull['number']
             pulls_response.append(data)
 
         today = last_month
