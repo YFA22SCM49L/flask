@@ -206,6 +206,7 @@ def github():
     repos_stars = []
     repos_forks = []
     repos_created_issues = []
+    repos_closed_issues = []
     for repo in repos_list:
         repository_url = GITHUB_URL + "repos/" + repo
         # Fetch GitHub data from GitHub API
@@ -217,6 +218,7 @@ def github():
 
         today = date.today()
         created_issues_count = 0
+        closed_issues_count = 0
         for i in range(24):
             last_month = date.today() + dateutil.relativedelta.relativedelta(months=-1)
             ranges = 'created:' + str(last_month) + '..' + str(today)
@@ -235,9 +237,12 @@ def github():
                 return resp
             if issues_items is None:
                 continue
+            for issue in issues_items:
+                if issue["state"] == "closed": closed_issues_count += 1
             created_issues_count += len(issues_items)
             today = last_month
         repos_created_issues.append([repo, created_issues_count])
+        repos_closed_issues.append([repo, closed_issues_count])
 
     '''
         1. Hit LSTM Microservice by passing issues_response as body
@@ -297,6 +302,7 @@ def github():
         "starCounts": repos_stars,
         "forkCounts": repos_forks,
         "reposCreatedIssuesCounts": repos_created_issues,
+        "reposClosedIssuesCounts": repos_closed_issues,
         "createdAtImageUrls": {
             **created_at_response.json(),
         },
