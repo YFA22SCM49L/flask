@@ -222,7 +222,7 @@ def github():
     today = date.today()
     last_month = today + dateutil.relativedelta.relativedelta(months=-1)
     commits_response = []
-    query_url_commits = GITHUB_URL + "search/commits?q=committer-date:" + str(last_month) + '..' + str(today) + ' ' + repo + "&" + per_page
+    query_url_commits = GITHUB_URL + "search/commits?q=committer-date:" + str(last_month) + '..' + str(today) + ' ' + "repo:" + repo_name + "&" + per_page
     app.logger.error(query_url_commits)
     search_commits = requests.get(query_url_commits, headers=headers)
     search_commits = search_commits.json()
