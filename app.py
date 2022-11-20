@@ -237,12 +237,12 @@ def github():
         resp = Response(json.dumps(error), mimetype='application/json')
         resp.status_code = 500
         return resp
-    if commits_items is None: continue
-    for commit in commits_items:
-        data = {}
-        data['created_at'] = commit["commit"]["committer"]["date"][0:10]
-        data['issue_number'] = commit["sha"]
-        commits_response.append(data)
+    if commits_items is not None:
+        for commit in commits_items:
+            data = {}
+            data['created_at'] = commit["commit"]["committer"]["date"][0:10]
+            data['issue_number'] = commit["sha"]
+            commits_response.append(data)
     '''for i in range(30):
         app.logger.error("current_day = " + str(current_day))
         repo = "repo=" + repo_name
