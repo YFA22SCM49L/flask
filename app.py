@@ -222,15 +222,18 @@ def github():
     current_day = date.today()
     commits_response = []
     for i in range(30):
+        app.logger.error("current_day = " + str(current_day))
         repo = 'repo:' + repo_name
         query_url_commits = GITHUB_URL + "search/commits?q=committer-date:" + str(current_day) + ' ' + repo + "&" + per_page
+        app.logger.error(query_url_commits)
         search_commits = requests.get(query_url_commits, headers=headers)
         search_commits = search_commits.json()
         current_day = current_day + dateutil.relativedelta.relativedelta(days=-1)
         commits_items = []
         try:
             commits_items = search_commits.get("items")
-            app.logger.error("total_count = " + search_commits.get("total_count"))
+            total_count = search_commits.get("total_count")
+            app.logger.error(total_count)
         except KeyError:
             error = {"error": "Data Not Available"}
             resp = Response(json.dumps(error), mimetype='application/json')
