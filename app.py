@@ -129,29 +129,6 @@ def github():
             data['Author'] = current_issue["user"]["login"]'''
             issues_reponse.append(data)
 
-        # Search for pull requests
-        '''types = 'type:pr'
-        search_query = types + ' ' + repo + ' ' + ranges
-        query_url_pulls = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
-        search_pulls = requests.get(query_url_pulls, headers=headers)
-        search_pulls = search_pulls.json()
-        pulls_items = []
-        try:
-            # Extract "items" from search pulls
-            pulls_items = search_pulls.get("items")
-        except KeyError:
-            error = {"error": "Data Not Available"}
-            resp = Response(json.dumps(error), mimetype='application/json')
-            resp.status_code = 500
-            return resp
-        if pulls_items is None:
-            continue
-        for pull in pulls_items:
-            data = {}
-            data['created_at'] = pull["created_at"]
-            data['issue_number'] = pull["number"]
-            pulls_response.append(data)'''
-
         today = last_month
 
     df = pd.DataFrame(issues_reponse)
@@ -220,7 +197,7 @@ def github():
     Fetch one month data of pulls and commits for LSTM
     '''
     today = date.today()
-    last_month = today + dateutil.relativedelta.relativedelta(months=-2)
+    last_month = today + dateutil.relativedelta.relativedelta(days=-40)
     types = 'type:pr'
     repo = 'repo:' + repo_name
     ranges = 'created:' + str(last_month) + '..' + str(today)
@@ -261,6 +238,7 @@ def github():
             pulls_response.append(data)
     app.logger.error(pulls_response)
 
+    last_month = today + dateutil.relativedelta.relativedelta(months=-2)
     commits_response = []
     ranges = 'committer-date:' + str(last_month) + '..' + str(today)
     search_query = repo + ' ' + ranges
