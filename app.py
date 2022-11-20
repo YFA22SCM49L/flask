@@ -237,7 +237,7 @@ def github():
         if commits_items is None: continue
         for commit in commits_items:
             data = {}
-            data['created_at'] = current_day
+            data['created_at'] = str(current_day)
             data['issue_number'] = commit["sha"]
             commits_response.append(data)
         current_day = current_day + dateutil.relativedelta.relativedelta(days=-1)
