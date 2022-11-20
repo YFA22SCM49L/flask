@@ -356,12 +356,6 @@ def github():
         "closedAtImageUrls": {
             **closed_at_response.json(),
         },
-        '''"pullsImageUrls": {
-            **pulls_at_response.json(),
-        },
-        "commitsImageUrls": {
-            **commits_at_response.json(),
-        },'''
     }
     # Return the response back to client (React app)
     return jsonify(json_response)
