@@ -228,6 +228,7 @@ def github():
         app.logger.error(query_url_commits)
         search_commits = requests.get(query_url_commits, headers=headers)
         search_commits = search_commits.json()
+        app.logger.error(search_commits)
         current_day = current_day + dateutil.relativedelta.relativedelta(days=-1)
         commits_items = []
         try:
