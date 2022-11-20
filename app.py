@@ -226,6 +226,7 @@ def github():
         query_url_commits = GITHUB_URL + "search/commits?q=committer-date:" + str(current_day) + ' ' + repo + "&" + per_page
         search_commits = requests.get(query_url_commits, headers=headers)
         search_commits = search_commits.json()
+        current_day = current_day + dateutil.relativedelta.relativedelta(days=-1)
         commits_items = []
         try:
             commits_items = search_commits.get("items")
@@ -240,7 +241,7 @@ def github():
             data['created_at'] = commit["commit"]["committer"]["date"][0:10]
             data['issue_number'] = commit["sha"]
             commits_response.append(data)
-        current_day = current_day + dateutil.relativedelta.relativedelta(days=-1)
+    app.logger.error(commits_items)
 
     '''
         1. Hit LSTM Microservice by passing issues_response as body
