@@ -220,7 +220,7 @@ def github():
     Fetch one month data of commits for LSTM
     '''
     today = date.today()
-    last_month = current_day + dateutil.relativedelta.relativedelta(months=-1)
+    last_month = today + dateutil.relativedelta.relativedelta(months=-1)
     commits_response = []
     query_url_commits = GITHUB_URL + "search/commits?q=committer-date:" + str(last_month) + '..' + str(today) + ' ' + repo + "&" + per_page
     app.logger.error(query_url_commits)
