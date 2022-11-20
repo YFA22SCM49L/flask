@@ -130,7 +130,7 @@ def github():
             issues_reponse.append(data)
 
         # Search for pull requests
-        types = 'type:pr'
+        '''types = 'type:pr'
         search_query = types + ' ' + repo + ' ' + ranges
         query_url_pulls = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
         search_pulls = requests.get(query_url_pulls, headers=headers)
@@ -150,7 +150,7 @@ def github():
             data = {}
             data['created_at'] = pull["created_at"]
             data['issue_number'] = pull["number"]
-            pulls_response.append(data)
+            pulls_response.append(data)'''
 
         today = last_month
 
@@ -269,6 +269,29 @@ def github():
             data['issue_number'] = commit["sha"]
             commits_response.append(data)'''
     app.logger.error(commits_response)
+
+    types = 'type:pr'
+    repo = 'repo:' + repo_name
+    ranges = 'created:' + str(last_month) + '..' + str(today)
+    search_query = types + ' ' + repo + ' ' + ranges
+    query_url_pulls = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
+    search_pulls = requests.get(query_url_pulls, headers=headers)
+    search_pulls = search_pulls.json()
+    pulls_items = []
+    try:
+        # Extract "items" from search pulls
+        pulls_items = search_pulls.get("items")
+    except KeyError:
+        error = {"error": "Data Not Available"}
+        resp = Response(json.dumps(error), mimetype='application/json')
+        resp.status_code = 500
+        return resp
+    if pulls_items is not None:
+        for pull in pulls_items:
+            data = {}
+            data['created_at'] = pull["created_at"]
+            data['issue_number'] = pull["number"]
+            pulls_response.append(data)
 
     '''
         1. Hit LSTM Microservice by passing issues_response as body
