@@ -223,7 +223,7 @@ def github():
     commits_response = []
     for i in range(30):
         query_url_commits = GITHUB_URL + "search/commits?q=committer-date:" + str(current_day) + "&" + per_page
-        search_commits = requests.get(query_url_pulls, headers=headers)
+        search_commits = requests.get(query_url_commits, headers=headers)
         search_commits = search_commits.json()
         commits_items = []
         try:
