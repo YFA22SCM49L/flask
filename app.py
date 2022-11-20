@@ -219,11 +219,33 @@ def github():
     '''
     Fetch one month data of commits for LSTM
     '''
-    current_day = date.today()
+    today = date.today()
+    last_month = current_day + dateutil.relativedelta.relativedelta(months=-1)
     commits_response = []
-    for i in range(30):
+    query_url_commits = GITHUB_URL + "search/commits?q=committer-date:" + str(last_month) + '..' + str(today) + ' ' + repo + "&" + per_page
+    app.logger.error(query_url_commits)
+    search_commits = requests.get(query_url_commits, headers=headers)
+    search_commits = search_commits.json()
+    app.logger.error(search_commits)
+    commits_items = []
+    try:
+        commits_items = search_commits.get("items")
+        total_count = search_commits.get("total_count")
+        app.logger.error(total_count)
+    except KeyError:
+        error = {"error": "Data Not Available"}
+        resp = Response(json.dumps(error), mimetype='application/json')
+        resp.status_code = 500
+        return resp
+    if commits_items is None: continue
+    for commit in commits_items:
+        data = {}
+        data['created_at'] = commit["commit"]["committer"]["date"][0:10]
+        data['issue_number'] = commit["sha"]
+        commits_response.append(data)
+    '''for i in range(30):
         app.logger.error("current_day = " + str(current_day))
-        repo = 'repo:' + repo_name
+        repo = "repo=" + repo_name
         query_url_commits = GITHUB_URL + "search/commits?q=committer-date:" + str(current_day) + ' ' + repo + "&" + per_page
         app.logger.error(query_url_commits)
         search_commits = requests.get(query_url_commits, headers=headers)
@@ -245,7 +267,7 @@ def github():
             data = {}
             data['created_at'] = commit["commit"]["committer"]["date"][0:10]
             data['issue_number'] = commit["sha"]
-            commits_response.append(data)
+            commits_response.append(data)'''
     app.logger.error(commits_response)
 
     '''
