@@ -203,10 +203,8 @@ def github():
     ranges = 'created:' + str(last_month) + '..' + str(today)
     search_query = types + ' ' + repo + ' ' + ranges
     query_url_pulls = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
-    app.logger.error(query_url_pulls)
     search_pulls = requests.get(query_url_pulls, headers=headers)
     search_pulls = search_pulls.json()
-    app.logger.error(search_pulls)
     pulls_items = []
     try:
         # Extract "items" from search pulls
@@ -218,10 +216,8 @@ def github():
             for item in items: pulls_items.append(item)
         for i in range(2, num_pages+1):
             query_url_pulls = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page + "&page=" + str(i)
-            app.logger.error(query_url_pulls)
             search_pulls = requests.get(query_url_pulls, headers=headers)
             search_pulls = search_pulls.json()
-            app.logger.error(search_pulls)
             items = search_pulls.get("items")
             if items is not None:
                 for item in items: pulls_items.append(item)
@@ -236,16 +232,13 @@ def github():
             data['created_at'] = pull["created_at"]
             data['issue_number'] = pull["number"]
             pulls_response.append(data)
-    app.logger.error(pulls_response)
 
     commits_response = []
     ranges = 'committer-date:' + str(last_month) + '..' + str(today)
     search_query = repo + ' ' + ranges
     query_url_commits = GITHUB_URL + "search/commits?q=" + search_query + "&" + per_page
-    app.logger.error(query_url_commits)
     search_commits = requests.get(query_url_commits, headers=headers)
     search_commits = search_commits.json()
-    app.logger.error(search_commits)
     commits_items = []
     try:
         total_count = search_commits.get("total_count")
@@ -255,10 +248,8 @@ def github():
             for item in items: commits_items.append(item)
         for i in range(2, num_pages+1):
             query_url_commits = GITHUB_URL + "search/commits?q=" + search_query + "&" + per_page + "&page=" + str(i)
-            app.logger.error(query_url_commits)
             search_commits = requests.get(query_url_commits, headers=headers)
             search_commits = search_commits.json()
-            app.logger.error(search_commits)
             items = search_commits.get("items")
             if items is not None:
                 for item in items: commits_items.append(item)
@@ -274,7 +265,6 @@ def github():
             data['created_at'] = commit["commit"]["committer"]["date"][0:10]
             data['issue_number'] = commit["sha"]
             commits_response.append(data)
-    app.logger.error(commits_response)
 
     '''
         1. Hit LSTM Microservice by passing issues_response as body
