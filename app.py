@@ -217,59 +217,10 @@ def github():
         repos_forks.append([repo, repository["forks_count"]])
 
     '''
-    Fetch one month data of commits for LSTM
+    Fetch one month data of pulls and commits for LSTM
     '''
     today = date.today()
     last_month = today + dateutil.relativedelta.relativedelta(months=-1)
-    commits_response = []
-    query_url_commits = GITHUB_URL + "search/commits?q=committer-date:" + str(last_month) + '..' + str(today) + ' ' + "repo:" + repo_name + "&" + per_page
-    app.logger.error(query_url_commits)
-    search_commits = requests.get(query_url_commits, headers=headers)
-    search_commits = search_commits.json()
-    app.logger.error(search_commits)
-    commits_items = []
-    try:
-        commits_items = search_commits.get("items")
-        total_count = search_commits.get("total_count")
-        app.logger.error(total_count)
-    except KeyError:
-        error = {"error": "Data Not Available"}
-        resp = Response(json.dumps(error), mimetype='application/json')
-        resp.status_code = 500
-        return resp
-    if commits_items is not None:
-        for commit in commits_items:
-            data = {}
-            data['created_at'] = commit["commit"]["committer"]["date"][0:10]
-            data['issue_number'] = commit["sha"]
-            commits_response.append(data)
-    '''for i in range(30):
-        app.logger.error("current_day = " + str(current_day))
-        repo = "repo=" + repo_name
-        query_url_commits = GITHUB_URL + "search/commits?q=committer-date:" + str(current_day) + ' ' + repo + "&" + per_page
-        app.logger.error(query_url_commits)
-        search_commits = requests.get(query_url_commits, headers=headers)
-        search_commits = search_commits.json()
-        app.logger.error(search_commits)
-        current_day = current_day + dateutil.relativedelta.relativedelta(days=-1)
-        commits_items = []
-        try:
-            commits_items = search_commits.get("items")
-            total_count = search_commits.get("total_count")
-            app.logger.error(total_count)
-        except KeyError:
-            error = {"error": "Data Not Available"}
-            resp = Response(json.dumps(error), mimetype='application/json')
-            resp.status_code = 500
-            return resp
-        if commits_items is None: continue
-        for commit in commits_items:
-            data = {}
-            data['created_at'] = commit["commit"]["committer"]["date"][0:10]
-            data['issue_number'] = commit["sha"]
-            commits_response.append(data)'''
-    app.logger.error(commits_response)
-
     types = 'type:pr'
     repo = 'repo:' + repo_name
     ranges = 'created:' + str(last_month) + '..' + str(today)
@@ -282,7 +233,21 @@ def github():
     pulls_items = []
     try:
         # Extract "items" from search pulls
-        pulls_items = search_pulls.get("items")
+        #pulls_items = search_pulls.get("items")
+        total_count = search_pulls.get("total_count")
+        num_pages = total_count // 100 + 1
+        items = search_pulls.get("items")
+        if items is not None:
+            for item in items: pulls_items.append(item)
+        for i in range(2, num_pages+1):
+            query_url_pulls = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page + "&page=" + str(i)
+            app.logger.error(query_url_pulls)
+            search_pulls = requests.get(query_url_pulls, headers=headers)
+            search_pulls = search_pulls.json()
+            app.logger.error(search_pulls)
+            items = search_pulls.get("items")
+            if items is not None:
+                for item in items: pulls_items.append(item)
     except KeyError:
         error = {"error": "Data Not Available"}
         resp = Response(json.dumps(error), mimetype='application/json')
@@ -294,7 +259,43 @@ def github():
             data['created_at'] = pull["created_at"]
             data['issue_number'] = pull["number"]
             pulls_response.append(data)
-    app.logger.error(pulls_response)
+
+    commits_response = []
+    ranges = 'committer-date:' + str(last_month) + '..' + str(today)
+    search_query = repo + ' ' + ranges
+    query_url_commits = GITHUB_URL + "search/commits?q=" + search_query + "&" + per_page
+    app.logger.error(query_url_commits)
+    search_commits = requests.get(query_url_commits, headers=headers)
+    search_commits = search_commits.json()
+    app.logger.error(search_commits)
+    commits_items = []
+    try:
+        total_count = search_commits.get("total_count")
+        num_pages = total_count // 100 + 1
+        items = search_commits.get("items")
+        if items is not None:
+            for item in items: commits_items.append(item)
+        for i in range(2, num_pages+1):
+            query_url_commits = GITHUB_URL + "search/commits?q=" + search_query + "&" + per_page + "&page=" + str(i)
+            app.logger.error(query_url_commits)
+            search_commits = requests.get(query_url_commits, headers=headers)
+            search_commits = search_commits.json()
+            app.logger.error(search_commits)
+            items = search_commits.get("items")
+            if items is not None:
+                for item in items: commits_items.append(item)
+        #app.logger.error(total_count)
+    except KeyError:
+        error = {"error": "Data Not Available"}
+        resp = Response(json.dumps(error), mimetype='application/json')
+        resp.status_code = 500
+        return resp
+    if commits_items is not None:
+        for commit in commits_items:
+            data = {}
+            data['created_at'] = commit["commit"]["committer"]["date"][0:10]
+            data['issue_number'] = commit["sha"]
+            commits_response.append(data)
 
     '''
         1. Hit LSTM Microservice by passing issues_response as body
