@@ -220,7 +220,7 @@ def github():
     Fetch one month data of pulls and commits for LSTM
     '''
     today = date.today()
-    last_month = today + dateutil.relativedelta.relativedelta(days=-40)
+    last_month = today + dateutil.relativedelta.relativedelta(months=-2)
     types = 'type:pr'
     repo = 'repo:' + repo_name
     ranges = 'created:' + str(last_month) + '..' + str(today)
