@@ -259,6 +259,7 @@ def github():
             data['created_at'] = pull["created_at"]
             data['issue_number'] = pull["number"]
             pulls_response.append(data)
+    app.logger.error(pulls_response)
 
     commits_response = []
     ranges = 'committer-date:' + str(last_month) + '..' + str(today)
@@ -296,6 +297,7 @@ def github():
             data['created_at'] = commit["commit"]["committer"]["date"][0:10]
             data['issue_number'] = commit["sha"]
             commits_response.append(data)
+    app.logger.error(commits_response)
 
     '''
         1. Hit LSTM Microservice by passing issues_response as body
