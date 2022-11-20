@@ -197,7 +197,7 @@ def github():
     Fetch one month data of pulls and commits for LSTM
     '''
     today = date.today()
-    last_month = today + dateutil.relativedelta.relativedelta(days=-40)
+    last_month = today + dateutil.relativedelta.relativedelta(months=-1)
     types = 'type:pr'
     repo = 'repo:' + repo_name
     ranges = 'created:' + str(last_month) + '..' + str(today)
@@ -238,7 +238,6 @@ def github():
             pulls_response.append(data)
     app.logger.error(pulls_response)
 
-    last_month = today + dateutil.relativedelta.relativedelta(months=-2)
     commits_response = []
     ranges = 'committer-date:' + str(last_month) + '..' + str(today)
     search_query = repo + ' ' + ranges
@@ -286,22 +285,26 @@ def github():
     created_at_body = {
         "issues": issues_reponse,
         "type": "created_at",
-        "repo": repo_name.split("/")[1]
+        "repo": repo_name.split("/")[1],
+        "look_back": 30
     }
     closed_at_body = {
         "issues": issues_reponse,
         "type": "closed_at",
-        "repo": repo_name.split("/")[1]
+        "repo": repo_name.split("/")[1],
+        "look_back": 30,
     }
     pulls_at_body = {
         "issues": pulls_response,
         "type": "created_at",
-        "repo": repo_name.split("/")[1]
+        "repo": repo_name.split("/")[1],
+        "look_back": 10
     }
     commits_at_body = {
         "issues": commits_response,
         "type": "created_at",
-        "repo": repo_name.split("/")[1]
+        "repo": repo_name.split("/")[1],
+        "look_back": 10
     }
 
     # Update your Google cloud deployed LSTM app URL (NOTE: DO NOT REMOVE "/")
