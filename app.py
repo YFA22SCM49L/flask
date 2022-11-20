@@ -230,7 +230,7 @@ def github():
         commits_items = []
         try:
             commits_items = search_commits.get("items")
-            app.logger.error("total_count = " search_commits.get("total_count"))
+            app.logger.error("total_count = " + search_commits.get("total_count"))
         except KeyError:
             error = {"error": "Data Not Available"}
             resp = Response(json.dumps(error), mimetype='application/json')
