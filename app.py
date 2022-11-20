@@ -194,7 +194,7 @@ def github():
     '''
     Fetch one month data of pulls and commits for LSTM
     '''
-    '''today = date.today()
+    today = date.today()
     last_month = today + dateutil.relativedelta.relativedelta(months=-1)
     types = 'type:pr'
     repo = 'repo:' + repo_name
@@ -231,7 +231,7 @@ def github():
             data['issue_number'] = pull["number"]
             pulls_response.append(data)
 
-    commits_response = []
+    '''commits_response = []
     ranges = 'committer-date:' + str(last_month) + '..' + str(today)
     search_query = repo + ' ' + ranges
     query_url_commits = GITHUB_URL + "search/commits?q=" + search_query + "&" + per_page
