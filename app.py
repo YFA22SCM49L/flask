@@ -275,8 +275,10 @@ def github():
     ranges = 'created:' + str(last_month) + '..' + str(today)
     search_query = types + ' ' + repo + ' ' + ranges
     query_url_pulls = GITHUB_URL + "search/issues?q=" + search_query + "&" + per_page
+    app.logger.error(query_url_pulls)
     search_pulls = requests.get(query_url_pulls, headers=headers)
     search_pulls = search_pulls.json()
+    app.logger.error(search_pulls)
     pulls_items = []
     try:
         # Extract "items" from search pulls
@@ -292,6 +294,7 @@ def github():
             data['created_at'] = pull["created_at"]
             data['issue_number'] = pull["number"]
             pulls_response.append(data)
+    app.logger.error(pulls_response)
 
     '''
         1. Hit LSTM Microservice by passing issues_response as body
