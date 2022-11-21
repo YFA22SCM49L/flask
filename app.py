@@ -374,6 +374,7 @@ def github():
         "monthlyCreatedIssuesCounts": created_at_issues,
         "monthlyClosedIssuesCounts": closed_at_issues,
         "contributors": contributors_response,
+        "releases": releases_response,
         "createdAtImageUrls": {
             **created_at_response.json(),
         },
