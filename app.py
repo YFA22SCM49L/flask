@@ -179,7 +179,6 @@ def github():
     repos_list = ["golang/go", "google/go-github", "angular/material", "angular/angular-cli",
         "sebholstein/angular-google-maps", "d3/d3", "facebook/react", "tensorflow/tensorflow",
         "keras-team/keras", "pallets/flask"]
-    two_years = date.today() + dateutil.relativedelta.relativedelta(years=-2)
     repos_stars = []
     repos_forks = []
     for repo in repos_list:
@@ -190,6 +189,18 @@ def github():
         repository = repository.json()
         repos_stars.append([repo, repository["stargazers_count"]])
         repos_forks.append([repo, repository["forks_count"]])
+
+    '''
+    Find the contributors of the repo.
+    '''
+    contributors_response = []
+    contributors_url = GITHUB_URL + "repos/" + repo_name + "/contributors"
+    contributors = requests.get(contributors_url, headers=headers)
+    contributors = contributors.json()
+    for contributor in contributors:
+        login = contributor["login"]
+        num_contributions = contributor["contributions"]
+        contributors_response.append([login, num_contributions])
 
     '''
     Fetch one month data of pulls and commits for LSTM
@@ -350,6 +361,7 @@ def github():
         "forkCounts": repos_forks,
         "monthlyCreatedIssuesCounts": created_at_issues,
         "monthlyClosedIssuesCounts": closed_at_issues,
+        "contributors": contributors_response,
         "createdAtImageUrls": {
             **created_at_response.json(),
         },
