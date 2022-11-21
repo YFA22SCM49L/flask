@@ -203,6 +203,18 @@ def github():
         contributors_response.append([login, num_contributions])
 
     '''
+    Find the releases and number of reactions of the repo.
+    '''
+    releases_response = []
+    releases_url = GITHUB_URL + "repos/" + repo_name + "/releases"
+    releases = requests.get(releases_url, headers=headers)
+    releases = releases.json()
+    for release in releases:
+        version = release["tag_name"]
+        num_reactions = release["reactions"]["total_count"]
+        releases_response.append([version, num_reactions])
+
+    '''
     Fetch one month data of pulls and commits for LSTM
     '''
     '''today = date.today()
