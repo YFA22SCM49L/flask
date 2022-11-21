@@ -210,9 +210,10 @@ def github():
     releases = requests.get(releases_url, headers=headers)
     releases = releases.json()
     for release in releases:
-        version = release["tag_name"]
-        num_reactions = release["reactions"]["total_count"]
-        releases_response.append([version, num_reactions])
+        if "reactions" in release:
+            version = release["tag_name"]
+            num_reactions = release["reactions"]["total_count"]
+            releases_response.append([version, num_reactions])
 
     '''
     Fetch one month data of pulls and commits for LSTM
